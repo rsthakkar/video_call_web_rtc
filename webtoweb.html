@@ -1,61 +1,65 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 	<title></title>
-<script src="https://cdn.jsdelivr.net/npm/peerjs@0.3.20/dist/peer.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/peerjs@0.3.20/dist/peer.min.js"></script>
 </head>
+
 <body>
 	<h1>Connect to</h1>
-	<input type="text" id = "peer_id" name="">
+	<h1 id="peerid"></h1>
+	<input type="text" id="peer_id" name="">
 	<button id="call" onclick="dest_call()">Call</button>
 	<video autoplay></video>
 </body>
 <script type="text/javascript">
-	// var localVideo = document.querySelector('#localVideo');
-	// var remoteVideo = document.querySelector('#remoteVideo');
-	// var peer = new Peer({key: 'peerjs',host:'localhost',port:9000});
-	var peer = new Peer({key: 'lwjd5qra8257b9'});
+// var localVideo = document.querySelector('#localVideo');
+// var remoteVideo = document.querySelector('#remoteVideo');
+// var peer = new Peer({key: 'peerjs',host:'localhost',port:9000});
+var peer = new Peer({ key: 'lwjd5qra8257b9' });
 var video = document.querySelector('video');
+var peerid = document.getElementById('peerid');
 
-	navigator.mediaDevices.getUserMedia({
-		  audio: true,
-		  video: true
-		}).then(gotStream);
-	function gotStream(stream) {
-	  console.log('Adding local stream.');
-	  localStream = stream;
-	  // video.srcObject = stream;
-	} 
+navigator.mediaDevices.getUserMedia({
+	// audio: true,
+	video: true
+}).then(gotStream);
 
-	peer.on('open', function(id) {
-	  console.log('My peer ID is: ' + id);
+function gotStream(stream) {
+	console.log('Adding local stream.');
+	localStream = stream;
+	// video.srcObject = stream;
+}
+
+peer.on('open', function(id) {
+	console.log('My peer ID is: ' + id);
+	peerid.innerHTML = id;
+});
+
+// var stream = new MediaStream();
+
+// console.log(stream);
+function dest_call() {
+	var dest_id = document.getElementById("peer_id").value;
+	console.log("destination is:" + dest_id);
+	var call = peer.call(dest_id, localStream);
+	call.on('stream', function(stream) {
+		console.log(stream);
+		video.srcObject = stream;;
+	});
+}
+
+peer.on('call', function(call) {
+	// Answer the call, providing our mediaStream
+	console.log("incoming call" + call);
+	call.answer(localStream);
+	call.on('stream', function(stream) {
+		console.log(stream);
+		video.srcObject = stream;;
 	});
 
-	// var stream = new MediaStream();
-
-	// console.log(stream);
-	function dest_call(){
-		var dest_id = document.getElementById("peer_id").value;
-		console.log("destination is:"+dest_id);
-		var call = peer.call(dest_id,localStream);
-		call.on('stream', function(stream) {
-      		console.log(stream);
-	      	video.srcObject = stream;; 
-      	});		
-	}
-
-	peer.on('call', function(call) {
-        // Answer the call, providing our mediaStream
-        console.log("incoming call"+call);
-        call.answer(localStream);
-      	call.on('stream', function(stream) {
-      		console.log(stream);
-	      	video.srcObject = stream;; 
-      	});
-
-      });
-
-
-
+});
 </script>
+
 </html>
