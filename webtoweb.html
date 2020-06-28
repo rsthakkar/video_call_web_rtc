@@ -22,7 +22,7 @@ var video = document.querySelector('video');
 var peerid = document.getElementById('peerid');
 
 navigator.mediaDevices.getUserMedia({
-	// audio: true,
+	audio: true,
 	video: true
 }).then(gotStream);
 
